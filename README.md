@@ -186,8 +186,8 @@ The bot collects minimal data to function:
 - IP addresses
 
 For full details, see:
-- [Privacy Policy](https://github.com/henims/LastWar-AllianceBot-Docs/blob/main/PRIVACY_POLICY.md)
-- [Terms of Service](https://github.com/henims/LastWar-AllianceBot-Docs/blob/main/TERMS_OF_SERVICE.md)
+- [Privacy Policy](https://github.com/henims/LastWar-AllianceBot-Docs/blob/main/PRIVACY_POLICY.MD)
+- [Terms of Service](https://github.com/henims/LastWar-AllianceBot-Docs/blob/main/TERMS_OF_SERVICE.MD)
 
 ## Getting Help
 
