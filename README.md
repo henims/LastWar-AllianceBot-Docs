@@ -1,212 +1,209 @@
 # LastWar Alliance Bot 🚗
 
-A Discord bot for LastWar alliances to manage train driver schedules and track loot activities.
+A multi-server Discord bot for LastWar alliances to manage train driver schedules and loot tracking with automatic daily notifications.
 
-## What Does This Bot Do?
+## Features
 
-### 🚂 Train Driver Management
-- **Automatic daily reminders** - Get notified every morning about who's driving today
-- **Weekly schedule** - View the full week's driver schedule at a glance
-- **Flexible assignments** - Assign drivers using @mentions or custom names
-- **Multi-language support** - Available in English, German, Hungarian, and Portuguese. *More languanges can be added upon request.
+### 🚂 Train Schedule Management
+- **Daily notifications** - Automatic posts at configurable time with today's driver and weekly schedule
+- **Multi-language support** - English, German, Hungarian, Portuguese, French, Czech
+- **Flexible scheduling** - Support for user mentions or custom text names
+- **Audit logging** - Track all schedule changes with timestamps
 
-### 📊 Loot Activity Tracking
-- **Track contributions** - Log truck loot, secret missions, and base attacks
-- **Personal statistics** - View your own loot participation stats
-- **Leaderboards** - See top contributors across different activity types
-- **Recognition** - Highlight the most active alliance members
+### 🎁 Loot Tracking
+- **Activity logging** - Track truck loot, secret missions, and base attacks
+- **Member statistics** - View individual member loot participation
+- **Leaderboards** - See top contributors across different activity types (with caching)
+- **Admin management** - Add/remove loot activities with full audit trail
 
-### ⚙️ Smart Notifications
-- Automatic daily posts at your preferred time
-- Shows today's driver prominently
-- Displays the full weekly schedule
-- Mentions today's driver for mobile notifications
-- Time-aware messages (before/after train time)
+### 🏢 Multi-Server Support
+- Run on multiple Discord servers simultaneously
+- Server-specific configurations (channels, admin roles, timezone)
+- Isolated data per server (guild-aware Redis namespacing)
+- Automatic cleanup of inactive guilds (30-day GDPR compliance)
+
+### 🔒 Security Features
+- **NoSQL injection protection** - Sanitized Redis key construction
+- **XSS protection** - Guild name and user input sanitization
+- **Prototype pollution protection** - Safe JSON parsing
+- **Timing attack protection** - Constant-time comparisons
+- **Rate limiting** - 10 commands/minute with Redis persistence
+- **Error sanitization** - No sensitive data in error messages
+- **DoS protection** - Size limits on stored data
+- **Security headers** - HTTP security headers on all endpoints
+- **Audit log redaction** - Sensitive data removed from logs
+
+### ⚡ Performance Optimizations
+- **Redis batching** - Pipeline and MGET for batch operations
+- **Parallel operations** - Promise.allSettled for concurrent tasks
+- **Multi-level caching** - Day index, leaderboards, channels, configs
+- **Memory cleanup** - Automatic cache invalidation
+- **N+1 prevention** - Optimized database queries
 
 ## Commands
 
-### For All Members
+### `/setup` (Admin only)
 
-#### View Today's Driver
+**Initial Configuration:**
 ```
-/alliance train view:today
+/setup configure channel:#channel time:08:00 timezone:Europe/Oslo - Complete initial setup (all required)
+/setup status                                                      - View current bot configuration
 ```
-See who's driving today with the full weekly schedule.
 
-#### View Weekly Schedule
+**Update Configuration (after initial setup):**
 ```
-/alliance train view:week
+/setup configure channel:#new-channel - Update notification channel only
+/setup configure time:09:00           - Update notification time only
+/setup configure timezone:Asia/Tokyo  - Update timezone only
 ```
-Display the complete week's driver assignments with status indicators.
 
-#### View Your Loot Stats
+**Language Management:**
 ```
-/alliance loot
+/setup language add language:english channel:#english-channel     - Add or update language channel
+/setup language add language:german channel:#german-channel       - Add German language channel
+/setup language remove language:english                           - Remove language channel
+/setup language list                                              - List all configured language channels
 ```
-Check your personal loot statistics:
-- Total activities by type (truck, secret, base)
-- Recent activity history
-- Last activity timestamp
 
----
+### `/admin` (R4/R5 roles only)
 
-### For Admins (R4/R5 Only)
+**Train Management:**
+```
+/admin train set-week     - Set the weekly driver schedule (Monday-Sunday)
+/admin train set-day      - Set driver for a specific day
+/admin train view-log     - View audit log of schedule changes
+```
 
-#### Set Weekly Schedule
+**Loot Management:**
+```
+/admin loot action:add                   - Add loot activity for a member
+/admin loot action:remove                - Remove a loot activity
+/admin loot action:view-log              - View loot audit log
+/admin loot action:view-member-stats     - View stats for specific member
+/admin loot action:top-10-type           - Top 10 leaderboard by type
+/admin loot action:top-10-total          - Top 10 overall leaderboard
+```
+
+### `/alliance` (all members)
+
+```
+/alliance train view:today  - Check who's driving today
+/alliance train view:week   - Show the full weekly schedule
+/alliance loot              - View your own loot statistics
+```
+
+## Quick Start
+
+### For Server Admins (Installing the Bot)
+
+1. **Invite the bot** using the invite URL provided by the bot owner
+2. **Run `/setup configure`** in your server:
+   ```
+   /setup configure channel:#alliance-chat time:08:00 timezone:Europe/Oslo
+   ```
+3. **Add language channels** (optional):
+   ```
+   /setup language add language:english channel:#english-chat
+   /setup language add language:german channel:#german-chat
+   ```
+4. **Set your train schedule**:
+   ```
+   /admin train set-week monday:@User1 tuesday:@User2 ...
+   ```
+
+The bot automatically detects when it's added to new servers and registers commands. No manual configuration needed!
+
+
+## Multi-Server Support
+
+The bot automatically supports multiple Discord servers with:
+
+- **Automatic detection** - Bot detects when added to new servers
+- **Dynamic configuration** - Server admins use `/setup` command to configure
+- **Independent data** - Redis keys are namespaced per guild
+- **Custom settings** - Different notification times, timezones per server
+- **Separate channels** - Each server configures its own language channels
+- **Isolated audit logs** - Each server maintains its own audit trail
+
+### How It Works
+
+1. **Server invites bot** using the invite URL
+2. **Bot auto-registers** slash commands for that server
+3. **Admin runs `/setup configure`** to set notification channel, time, and timezone
+4. **Admin optionally adds** language channels with `/setup language add`
+5. **Bot creates isolated** Redis namespace for that server's data
+
+No manual configuration or server restarts needed!
+
+## Usage Examples
+
+### Setting Weekly Schedule (Sunday evening)
+
 ```
 /admin train set-week
+  monday:@User1
+  tuesday:@User2
+  wednesday:@User3
+  thursday:@User4
+  friday:@User5
+  saturday:@User6
+  sunday:@User7
 ```
-Assign drivers for the entire week at once. You can:
-- Mention Discord users: `@username`
-- Use custom names: `*CustomName`
-- Update multiple days or just one day
 
-**Example:**
+**Using freetext names:**
 ```
 /admin train set-week
-  monday: @JohnDoe
-  tuesday: *JaneSmith
-  wednesday: @UserXYZ
+  monday:*JohnDoe
+  tuesday:*JaneSmith
+  wednesday:@User3
+  ...
 ```
 
-#### Set Single Day
-```
-/admin train set-day
-```
-Update the driver for just one specific day.
+### Adding Loot Activities
 
-#### View Schedule Change Log
 ```
-/admin train view-log
-```
-See who made changes to the schedule and when.
-
----
-
-#### Add Loot Activity
-```
-/admin loot action:add
-```
-Log a loot activity for a member:
-- **Type**: Truck Loot 🚛, Secret Mission 🕵️, or Base Attack ⚔️
-- **Member**: @mention or *CustomName
-
-**Example:**
-```
-/admin loot action:add type:truck member:@JohnDoe
+/admin loot add type:truck member:@User1
+/admin loot add type:secret member:*CustomName
+/admin loot add type:base member:@User2
 ```
 
-#### Remove Loot Activity
-```
-/admin loot action:remove
-```
-Remove the most recent loot activity for a member.
+### Viewing Statistics
 
-#### View Member Stats
 ```
-/admin loot action:view-member-stats
-```
-View detailed loot statistics for any member:
-- Total activities by type
-- Recent activity history
-- Last activity date
-
-#### View Top 10 by Type
-```
-/admin loot action:top-10-type
-```
-Display leaderboard for a specific loot type:
-- 🚛 Top 10 Truck Looters
-- 🕵️ Top 10 Secret Mission Contributors
-- ⚔️ Top 10 Base Attackers
-
-**Example:**
-```
-/admin loot action:top-10-type type:truck
+/alliance loot-stats member:@User1
+/alliance loot-leaderboard type:truck
+/alliance loot-leaderboard type:all
 ```
 
-#### View Overall Top 10
-```
-/admin loot action:top-10-total
-```
-Display overall leaderboard with breakdown:
-- Total activities across all types
-- Individual breakdown (truck/secret/base counts)
-- Medal rankings 🥇🥈🥉
+### Initial Bot Setup
 
-#### View Loot Audit Log
 ```
-/admin loot action:view-log
-```
-See recent loot additions and removals with timestamps.
-
----
-
-#### Configure Bot Settings
-```
-/admin config show                  - View current settings
-/admin config set-time              - Change notification time
-/admin config set-timezone          - Set timezone
-/admin config test-notification     - Send test notification
-/admin config add-admin             - Add admin role/user
-/admin config remove-admin          - Remove admin role/user
+/setup configure channel:#alliance-chat time:08:00 timezone:Europe/Oslo
+/setup language add language:english channel:#english-chat
+/setup language add language:german channel:#german-chat
 ```
 
-## Daily Notifications
+### Updating Configuration
 
-The bot automatically posts every day at your configured time:
+```
+/setup configure time:09:00
+/setup configure timezone:America/New_York
+/setup status
+```
 
-### Before Train Time (13:00 weekdays / 15:00 weekends)
-- 🚂 Today's driver shown prominently
-- 📅 Full weekly schedule
-- 🔔 Driver gets mentioned for mobile notification
+## Daily Notification
 
-### After Train Time
-- ✅ "Train completed" message
-- 📋 Weekly schedule with completed days checked off
+The bot automatically posts in configured channels at the set time with:
 
-## Supported Languages
+**Before train time (13:00 weekdays / 15:00 weekends):**
+- Today's driver prominently displayed
+- Full weekly schedule
+- Driver mention for mobile notifications
 
-The bot automatically detects the channel language and responds accordingly:
-- 🇬🇧 English
-- 🇩🇪 German
-- 🇭🇺 Hungarian
-- 🇵🇹 Portuguese
+**After train time:**
+- "Train completed" message
+- Weekly schedule with completed days marked
 
-## Privacy & Data
+## License
 
-The bot collects minimal data to function:
-- Discord user IDs (for assignments and stats)
-- Activity timestamps
-- Schedule assignments
-
-**We do not collect:**
-- Message content
-- Personal information
-- IP addresses
-
-For full details, see:
-- [Privacy Policy](https://github.com/henims/LastWar-AllianceBot-Docs/blob/main/PRIVACY_POLICY.MD)
-- [Terms of Service](https://github.com/henims/LastWar-AllianceBot-Docs/blob/main/TERMS_OF_SERVICE.MD)
-
-## Getting Help
-
-If you encounter issues or have questions:
-- Contact your server admins
-- Report bugs: [GitHub Issues](https://github.com/henims/LastWar-AllianceBot-Docs/issues)
-
-## Features at a Glance
-
-✅ **Multi-server support** - Works on multiple Discord servers
-✅ **Automatic reminders** - Never forget who's driving
-✅ **Flexible scheduling** - Use @mentions or custom names
-✅ **Loot tracking** - Track and recognize contributions
-✅ **Leaderboards** - Friendly competition and recognition
-✅ **Audit logs** - Full transparency of changes
-✅ **Multi-language** - Supports 4 languages
-✅ **Time-aware** - Different messages before/after train time
-✅ **Mobile-friendly** - Mentions work on mobile devices
-
----
-
-**Made with ❤️ for LastWar alliances**
+MIT
