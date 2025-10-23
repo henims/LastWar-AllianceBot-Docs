@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last Updated:** January 6, 2025
+**Last Updated:** October 23, 2025
 
 ## 1. Introduction
 
@@ -45,23 +45,44 @@ We use collected information to:
 ### 4.1 Storage Location
 
 Data is stored in:
+- **Application Server**: Hosted on Railway in EU West region (Amsterdam, Netherlands)
 - **Redis Database**: Hosted on Upstash (secure cloud Redis provider)
 - **Encrypted in transit**: All connections use TLS/SSL encryption
 
 ### 4.2 Data Retention
 
 - **Active Data**: Retained while the Bot is in your server
-- **Audit Logs**: Kept for 30 days, then archived
+- **Audit Logs**: Kept for 30 days, with sensitive data redacted for privacy protection
 - **Statistics**: Retained indefinitely for leaderboard purposes
-- **Deleted Data**: When the Bot leaves a server, all guild-specific data is retained for 30 days then deleted
+- **Automatic Deletion**: When the Bot leaves a server, all guild-specific data is automatically deleted after 30 days
 
 ### 4.3 Security Measures
 
-We implement:
-- Secure database connections (TLS/SSL)
-- Guild-namespaced data (servers cannot access each other's data)
-- Rate limiting to prevent abuse
-- Regular security updates
+We implement comprehensive security measures to protect your data:
+
+**Infrastructure Security:**
+- Secure database connections (TLS/SSL encryption)
+- Guild-namespaced data isolation (servers cannot access each other's data)
+- Security headers on all HTTP endpoints
+- Regular security updates and monitoring
+
+**Input Validation & Sanitization:**
+- NoSQL injection protection in database queries
+- XSS (Cross-Site Scripting) vulnerability protection
+- Pattern validation for all user inputs
+- Size limits to prevent Denial-of-Service attacks (CWE-770)
+
+**Access Control & Privacy:**
+- Rate limiting (10 commands per minute) to prevent abuse
+- Fail-closed rate limiter mode for enhanced security
+- Timing attack protection for user validation
+- Sensitive data redaction in audit logs and error messages
+- Custom admin role support for granular access control
+
+**Cryptographic Security:**
+- Cryptographically secure random number generation (crypto.randomBytes)
+- Prototype pollution protection in JSON parsing
+- Secure session and token handling
 
 ## 5. Data Sharing and Third Parties
 
@@ -73,6 +94,7 @@ We do not sell, rent, or trade your information to third parties.
 
 We use the following services:
 - **Discord API**: For bot functionality (governed by Discord's Privacy Policy)
+- **Railway**: For application hosting (governed by Railway's Privacy Policy)
 - **Upstash Redis**: For data storage (governed by Upstash's Privacy Policy)
 - **GitHub**: For code hosting and issue tracking
 
@@ -107,8 +129,8 @@ The Bot does not knowingly collect information from users under 13 years of age.
 ## 8. International Data Transfers
 
 Data may be stored and processed in:
-- Europe (Upstash Redis regions)
-- United States (Discord API)
+- **Europe (EU West)**: Railway application hosting (Amsterdam, Netherlands), Upstash Redis
+- **United States**: Discord API
 
 By using the Bot, you consent to these transfers.
 
